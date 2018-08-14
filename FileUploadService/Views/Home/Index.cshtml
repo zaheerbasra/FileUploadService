@@ -1,0 +1,74 @@
+﻿<div class="jumbotron">
+    <h2>ASP.NET</h2>
+    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
+</div>
+
+<div class="container">
+    <div class="col-md-6 col-md-offset-3">
+        <h3>File Input Example</h3>
+        <div id="msgs">
+
+        </div>
+        <br />
+        <form enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group input-file">
+                        <span class="input-group-btn">
+                            <input name="file" type="file" class="form-control" />
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <input type="button" value="Upload" class="btn btn-primary" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section scripts {
+<script type="text/javascript">
+    $(':button').on('click', function () {
+        $.ajax({
+            // Your server script to process the upload
+            url: '/api/file/Post',
+            type: 'POST',
+
+            // Form data
+            data: new FormData($('form')[0]),
+
+            // Tell jQuery not to process data or worry about content-type
+            // You *must* include these options!
+            cache: false,
+            contentType: false,
+            processData: false,
+
+            // Custom XMLHttpRequest
+            xhr: function () {
+                var myXhr = $.ajaxSettings.xhr();
+                if (myXhr.upload) {
+                    // For handling the progress of the upload
+                    myXhr.upload.addEventListener('progress', function (e) {
+                        if (e.lengthComputable) {
+                            $('progress').attr({
+                                value: e.loaded,
+                                max: e.total,
+                            });
+                        }
+                    }, false);
+                }
+                return myXhr;
+            },
+
+            success: function (data, text) {
+                $('#msgs').html("<div class='alert alert-success'>" + text + "</div>");
+                $('form')[0].reset();
+            },
+            error: function (request, status, error) {
+                $('#msgs').html("<div class='alert alert-danger'>" + request.responseText + "</div>");
+            }
+        });
+    });
+</script>
+}
